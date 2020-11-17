@@ -1,22 +1,16 @@
-import { Router } from "@reach/router";
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Home from "./pages/Home";
-import Server from "./pages/Server";
-import Channel from "./pages/Channel";
 import reportWebVitals from "./reportWebVitals";
+import { Routes } from "./router";
 
-ReactDOM.render(
+// @ts-ignore
+ReactDOM.unstable_createRoot(
+  document.getElementById("root") as HTMLElement
+).render(
   <React.StrictMode>
-    <Router>
-      <Home path="/" />
-      <Server path="/server/:serverId" />
-      <Channel path="/server/:serverId/:channelId" />
-    </Router>
-  </React.StrictMode>,
-  document.getElementById("root")
+    <Routes />
+  </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

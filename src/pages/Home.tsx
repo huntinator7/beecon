@@ -1,16 +1,11 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { RouteComponentProps } from "@reach/router";
-import { G } from "../components";
 import styled from "styled-components";
 
 interface Props extends RouteComponentProps {}
 
-const Home = (_props: Props) => {
-  return (
-    <G.Page>
-      <S.Title>Welcome To Beecon</S.Title>
-    </G.Page>
-  );
+const Home: FunctionComponent<Props> = (_props) => {
+  return <S.Title>Welcome To Beecon</S.Title>;
 };
 
 export default Home;

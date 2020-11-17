@@ -1,14 +1,22 @@
-import React, { FunctionComponent } from "react";
+import { RouteComponentProps } from "@reach/router";
+import React, { FunctionComponent, Suspense } from "react";
+import { CircleLoader } from "react-spinners";
 import { G } from ".";
 
-interface Props {}
+interface Props extends RouteComponentProps {}
 
-const Page: FunctionComponent<Props> = (props) => (
-  <G.Container id="global-container">
-    <G.Navbar />
-    <G.Sidebar />
-    <main id="page-wrapper">{props.children}</main>
-  </G.Container>
-);
+const wrapPage = (Component: FunctionComponent<any>) => (props: Props) => {
+  return (
+    <G.Container id="global-container">
+      <G.Navbar {...props} />
+      <G.Sidebar {...props} />
+      <main id="page-wrapper">
+        <Suspense fallback={<CircleLoader />}>
+          <Component {...props} />
+        </Suspense>
+      </main>
+    </G.Container>
+  );
+};
 
-export default Page;
+export default wrapPage;
