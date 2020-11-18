@@ -49,7 +49,7 @@ const S = {
     width: 100vw;
     height: calc(100vh - 64px);
     position: fixed;
-    bottom: 0px;
+    top: 64px;
     left: 0px;
     overflow: auto;
   `,
