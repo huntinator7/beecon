@@ -52,5 +52,9 @@ const S = {
     top: 64px;
     left: 0px;
     overflow: auto;
+    @media screen and (max-width: 599px) {
+      height: calc(100vh - 56px);
+      top: 56px;
+    }
   `,
 };
