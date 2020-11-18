@@ -47,13 +47,19 @@ const S = {
   Main: styled.main`
     padding: 0px;
     width: 100vw;
-    height: calc(100vh - 64px);
+    height: calc(
+      100vh - 64px
+    ); /* Fallback for browsers that do not support Custom Properties */
+    height: calc(var(--vh, 1vh) * 100 - 64px);
     position: fixed;
     top: 64px;
     left: 0px;
     overflow: auto;
     @media screen and (max-width: 599px) {
-      height: calc(100vh - 56px);
+      height: calc(
+        100vh - 56px
+      ); /* Fallback for browsers that do not support Custom Properties */
+      height: calc(var(--vh, 1vh) * 100 - 56px);
       top: 56px;
     }
   `,
