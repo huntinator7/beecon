@@ -1,20 +1,47 @@
 import { Router } from "@reach/router";
-import React from "react";
-import HomeRoute from "./pages/Home";
-import ServerRoute from "./pages/Server";
-import ChannelRoute from "./pages/Channel";
-import wrapPage from "./components/page";
+import React, { FunctionComponent } from "react";
+import Home from "./pages/Home";
+import Server from "./pages/Server";
+import Channel from "./pages/Channel";
+import { SuspenseWithPerf } from "reactfire";
+import { G } from "./components";
+import { CircleLoader } from "react-spinners";
+import styled from "styled-components";
 
-const Home = wrapPage(HomeRoute);
-const Server = wrapPage(ServerRoute);
-const Channel = wrapPage(ChannelRoute);
-
-export const Routes = () => {
+export const Routes: FunctionComponent<any> = (props) => {
   return (
-    <Router>
-      <Home path="/" />
-      <Server path="/server/:serverId" />
-      <Channel path="/server/:serverId/:channelId" />
-    </Router>
+    <G.Container id="global-container">
+      <G.Navbar {...props} />
+      <SuspenseWithPerf
+        fallback={<CircleLoader />}
+        traceId={"sidebar-server-list"}
+      >
+        <G.Sidebar {...props} />
+      </SuspenseWithPerf>
+      <S.Main id="page-wrapper">
+        <SuspenseWithPerf
+          fallback={<CircleLoader />}
+          traceId={props.uri ?? "traceId"}
+        >
+          <Router>
+            <Home path="/" />
+            <Server path="/server/:serverId" />
+            <Channel path="/server/:serverId/:channelId" />
+          </Router>
+        </SuspenseWithPerf>
+      </S.Main>
+    </G.Container>
   );
+};
+
+const S = {
+  Main: styled.main`
+    padding: 0px 20px;
+    width: calc(100vw - 240px);
+    height: calc(100vh - 64px);
+    position: fixed;
+    bottom: 0px;
+    left: 200px;
+    overflow: auto;
+  `,
 };

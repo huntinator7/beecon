@@ -1,16 +1,28 @@
-import React, { useEffect } from "react";
+import { Link } from "@reach/router";
+import React, { useContext, useEffect } from "react";
 import { push as Menu } from "react-burger-menu";
+import {
+  useFirestore,
+  useFirestoreCollection,
+  useFirestoreCollectionData,
+} from "reactfire";
 import styled from "styled-components";
+import { StoreContext } from "../store";
 
 const Sidebar = (props: any) => {
+  const { state } = useContext(StoreContext);
+
+  const serverRef = useFirestore().collection("Server");
+  const serverList = useFirestoreCollectionData(serverRef);
+
   useEffect(() => {
-    console.log(props);
-  }, []);
+    console.log(props, state, serverList);
+  }, [props, state, serverList]);
 
   return (
     <div className="left">
       <Menu
-        isOpen={true}
+        isOpen={state.sidebarOpen}
         noOverlay
         disableOverlayClick
         width={200}
@@ -21,21 +33,11 @@ const Sidebar = (props: any) => {
       >
         <div style={{ height: "100%" }}>
           <S.Sidebar>
-            <a className="text-light" href="/server/0">
-              Default Server
-            </a>
-            <a className="text-light" href="/server/0/0">
-              Default Channel
-            </a>
-            <a className="text-light" href="/server/1/2">
-              Other Channels 1
-            </a>
-            <a className="text-light" href="/server/0/4">
-              Other Channels 2
-            </a>
-            <a className="text-light" href="/server/12/6">
-              Other Channels 3
-            </a>
+            {serverList.map((s: any) => (
+              <Link className="text-light" to={`/server/${s.id}`}>
+                {s.ServerName}
+              </Link>
+            ))}
           </S.Sidebar>
         </div>
       </Menu>
@@ -49,11 +51,20 @@ const S = {
   Sidebar: styled.div`
     display: flex;
     flex-direction: column;
+    background-color: #242f40;
     height: 100%;
     > a {
-      padding: 10px;
+      padding: 10px 20px;
       font-weight: bold;
+      color: #ffbe30;
+      text-decoration: none;
+      &:hover {
+        color: #242f40;
+        background-color: #ffbe30;
+      }
+    }
+    &:focus {
+      outline: none;
     }
   `,
-  
 };

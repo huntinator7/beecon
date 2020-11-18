@@ -1,19 +1,31 @@
 import { RouteComponentProps } from "@reach/router";
-import React, { FunctionComponent, Suspense } from "react";
+import React, { FunctionComponent, Suspense, useEffect } from "react";
 import { CircleLoader } from "react-spinners";
+import { SuspenseWithPerf } from "reactfire";
 import { G } from ".";
 
 interface Props extends RouteComponentProps {}
 
 const wrapPage = (Component: FunctionComponent<any>) => (props: Props) => {
+  useEffect(() => {
+    console.log(props);
+  });
   return (
     <G.Container id="global-container">
       <G.Navbar {...props} />
-      <G.Sidebar {...props} />
+      <SuspenseWithPerf
+        fallback={<CircleLoader />}
+        traceId={"sidebar-server-list"}
+      >
+        <G.Sidebar {...props} />
+      </SuspenseWithPerf>
       <main id="page-wrapper">
-        <Suspense fallback={<CircleLoader />}>
+        <SuspenseWithPerf
+          fallback={<CircleLoader />}
+          traceId={props.uri ?? "traceId"}
+        >
           <Component {...props} />
-        </Suspense>
+        </SuspenseWithPerf>
       </main>
     </G.Container>
   );

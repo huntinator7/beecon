@@ -6,8 +6,10 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core";
-import React, { useEffect } from "react";
+import React, { useCallback, useContext, useEffect } from "react";
 import MenuIcon from "@material-ui/icons/Menu";
+import { StoreContext } from "../store";
+import { navigate } from "@reach/router";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,25 +24,46 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Navbar = (props: any) => {
+  const { dispatch } = useContext(StoreContext);
   const classes = useStyles();
 
-  useEffect(() => {
+  const logProps = useCallback(() => {
     console.log(props);
-  }, []);
+  }, [props]);
+
+  useEffect(() => {
+    logProps();
+  }, [logProps]);
+
+  const toggleSidebar = () => {
+    dispatch({ type: "TOGGLE_SIDEBAR" });
+  };
+
+  const navToHome = () => {
+    navigate("/");
+  };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="static"
+      style={{ backgroundColor: "#242f40", color: "#ffbe30" }}
+    >
       <Toolbar>
         <IconButton
           edge="start"
           className={classes.menuButton}
           color="inherit"
           aria-label="menu"
+          onClick={toggleSidebar}
         >
           <MenuIcon />
         </IconButton>
-        <Typography variant="h6" className={classes.title}>
-          {}
+        <Typography
+          className={classes.title + " home-button"}
+          variant="h6"
+          onClick={navToHome}
+        >
+          Beecon
         </Typography>
         <Button color="inherit">Login</Button>
       </Toolbar>
