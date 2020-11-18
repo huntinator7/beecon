@@ -34,6 +34,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     backgroundColor: "#dddfe4",
+    minHeight: "100vh",
   },
   inline: {
     display: "inline",
