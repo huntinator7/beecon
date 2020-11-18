@@ -46,7 +46,7 @@ export const Routes: FunctionComponent<any> = (props) => {
 const S = {
   Main: styled.main`
     padding: 0px;
-    width: calc(100vw - 200px);
+    width: 100vw;
     height: calc(100vh - 64px);
     position: fixed;
     bottom: 0px;
