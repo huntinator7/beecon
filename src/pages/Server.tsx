@@ -2,12 +2,14 @@ import React, { FunctionComponent, useEffect, useState } from "react";
 import { Link, RouteComponentProps } from "@reach/router";
 import * as uuid from "uuid";
 import {
+  AuthCheck,
   useFirestore,
   useFirestoreCollectionData,
   useFirestoreDocData,
 } from "reactfire";
 import styled from "styled-components";
 import "firebase/firestore";
+import Login from "./Login";
 
 interface Props extends RouteComponentProps {
   serverId?: string;
@@ -29,10 +31,10 @@ const Server: FunctionComponent<Props> = (props) => {
   useEffect(() => {
     console.log(server);
     console.log(channelList);
-  });
+  }, []);
 
   return (
-    <>
+    <AuthCheck fallback={<Login />}>
       <S.TitleRow>
         <S.Title data-testid="server-title">{server.ServerName}</S.Title>
         <S.Subtitle data-testid="channel-id">{props.serverId}</S.Subtitle>
@@ -51,7 +53,7 @@ const Server: FunctionComponent<Props> = (props) => {
         onChange={(e) => setChannelName(e.target.value)}
       />
       <button onClick={addChannel}>Create Channel</button>
-    </>
+    </AuthCheck>
   );
 };
 

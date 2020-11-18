@@ -1,16 +1,23 @@
-import React, { FunctionComponent, useEffect, useRef, useState } from "react";
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { RouteComponentProps } from "@reach/router";
 import * as uuid from "uuid";
 import {
+  AuthCheck,
   useFirestore,
   useFirestoreCollectionData,
   useFirestoreDocData,
+  useUser,
 } from "reactfire";
 import styled from "styled-components";
 import {
   Avatar,
   Button,
-  Chip,
   List,
   ListItem,
   ListItemAvatar,
@@ -20,11 +27,13 @@ import {
   Typography,
 } from "@material-ui/core";
 import { formatRelative } from "date-fns";
+import { StoreContext } from "../store";
+import Login from "./Login";
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: "75%",
-    backgroundColor: theme.palette.background.paper,
+    width: "100%",
+    backgroundColor: "#dddfe4",
   },
   inline: {
     display: "inline",
@@ -37,16 +46,17 @@ interface Props extends RouteComponentProps {
 }
 
 const Channel: FunctionComponent<Props> = (props) => {
+  const user: any = useUser();
+  const { dispatch } = useContext(StoreContext);
   const classes = useStyles();
 
   const [message, setMessage] = useState("");
-  const [name, setName] = useState("");
   const messageBoxRef: any = useRef();
 
   const serverRef = useFirestore().collection("Server").doc(props.serverId);
   const channelRef = serverRef.collection("Channel").doc(props.channelId);
   const messagesRef = channelRef.collection("Message");
-  const server = useFirestoreDocData(serverRef);
+  // const server = useFirestoreDocData(serverRef);
   const channel: any = useFirestoreDocData(channelRef);
   const messages: any[] = useFirestoreCollectionData(
     messagesRef.orderBy("timeSent")
@@ -61,29 +71,24 @@ const Channel: FunctionComponent<Props> = (props) => {
         message,
         id: newMessageId,
         timeSent: new Date(),
-        userName: name,
+        userName: user.displayName,
       })
       .then(() => {
         setMessage("");
         messageBoxRef.current.focus();
+        dispatch({ type: "SCROLL_MAIN_REF" });
       });
   };
 
   useEffect(() => {
-    console.log(server);
-    console.log(channel);
-    console.log(messages);
-  }, [server, channel, messages]);
+    console.log(user);
+    dispatch({ type: "SCROLL_MAIN_REF" });
+  }, []);
 
   return (
-    <>
+    <AuthCheck fallback={<Login />}>
       <S.TitleRow>
         <S.Title data-testid="channel-title">{channel.ChannelName}</S.Title>
-        <TextField
-          label="Name to Use"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
       </S.TitleRow>
       <List className={classes.root}>
         {messages.map((m) => (
@@ -127,7 +132,7 @@ const Channel: FunctionComponent<Props> = (props) => {
           </ListItem>
         ))}
       </List>
-      <div>
+      <S.SendMessage>
         <TextField
           inputRef={messageBoxRef}
           value={message}
@@ -139,15 +144,17 @@ const Channel: FunctionComponent<Props> = (props) => {
           }}
         />
         <Button onClick={sendMessage}>Send</Button>
-      </div>
-    </>
+      </S.SendMessage>
+    </AuthCheck>
   );
 };
 
 export default Channel;
 
 const S = {
-  Title: styled.h1``,
+  Title: styled.h1`
+    color: #242f40;
+  `,
   Subtitle: styled.h5``,
   Message: styled.li`
     padding: 10px;
@@ -161,9 +168,17 @@ const S = {
     position: sticky;
     top: 0px;
     z-index: 1000;
-    background-color: white;
+    padding: 0px 20px;
+    background-color: #ffbe30;
     > * {
       margin-right: 20px;
     }
+  `,
+  SendMessage: styled.div`
+    position: sticky;
+    z-index: 1000;
+    background-color: #ffbe30;
+    bottom: 0px;
+    padding: 10px 20px;
   `,
 };

@@ -8,9 +8,10 @@ import { StoreAction } from "./actions";
 
 interface StoreState {
   sidebarOpen: boolean;
+  mainRef: any;
 }
 
-const initialStore: StoreState = { sidebarOpen: true };
+const initialStore: StoreState = { sidebarOpen: true, mainRef: null };
 
 function reducer(state: StoreState, action: StoreAction) {
   switch (action.type) {
@@ -20,8 +21,13 @@ function reducer(state: StoreState, action: StoreAction) {
       return { ...state, sidebarOpen: false };
     case "TOGGLE_SIDEBAR":
       return { ...state, sidebarOpen: !state.sidebarOpen };
+    case "SET_MAIN_REF":
+      return { ...state, mainRef: action.mainRef };
+    case "SCROLL_MAIN_REF":
+      state.mainRef.current.scrollTop = state.mainRef.current.scrollHeight;
+      return state;
     default:
-      throw new Error();
+      return state;
   }
 }
 

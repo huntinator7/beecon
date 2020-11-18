@@ -2,9 +2,8 @@ import React, { FunctionComponent, useState } from "react";
 import { RouteComponentProps } from "@reach/router";
 import styled from "styled-components";
 import * as uuid from "uuid";
-import {
-  useFirestore,
-} from "reactfire";
+import { AuthCheck, useFirestore } from "reactfire";
+import Login from "./Login";
 
 interface Props extends RouteComponentProps {}
 
@@ -29,14 +28,14 @@ const Home: FunctionComponent<Props> = (_props) => {
       });
   };
   return (
-    <>
+    <AuthCheck fallback={<Login />}>
       <S.Title>Welcome To Beecon</S.Title>
       <input
         value={ServerName}
         onChange={(e) => setServerName(e.target.value)}
       />
       <button onClick={addServer}>Create Server</button>
-    </>
+    </AuthCheck>
   );
 };
 
