@@ -57,7 +57,7 @@ const Channel: FunctionComponent<Props> = (props) => {
   const serverRef = useFirestore().collection("Server").doc(props.serverId);
   const channelRef = serverRef.collection("Channel").doc(props.channelId);
   const messagesRef = channelRef.collection("Message");
-  // const server = useFirestoreDocData(serverRef);
+
   const channel: any = useFirestoreDocData(channelRef);
   const messages: any[] = useFirestoreCollectionData(
     messagesRef.orderBy("timeSent")
@@ -65,20 +65,20 @@ const Channel: FunctionComponent<Props> = (props) => {
 
   const sendMessage = () => {
     if (!message) return;
-    const newMessageId = uuid.v4();
-    messagesRef
-      .doc(newMessageId)
-      .set({
-        message,
-        id: newMessageId,
-        timeSent: new Date(),
-        userName: user.displayName,
-      })
-      .then(() => {
-        setMessage("");
-        messageBoxRef.current.focus();
-        dispatch({ type: "SCROLL_MAIN_REF" });
-      });
+    const body = {
+      serverId: props.serverId,
+      channelId: props.channelId,
+      message,
+      userName: user.displayName,
+    };
+    fetch("https://us-central1-beecon-d2a75.cloudfunctions.net/addMessage", {
+      method: "POST",
+      mode: "cors",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   };
 
   useEffect(() => {
