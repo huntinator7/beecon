@@ -9,6 +9,7 @@ import { RouteComponentProps } from "@reach/router";
 import * as uuid from "uuid";
 import {
   AuthCheck,
+  useAuth,
   useFirestore,
   useFirestoreCollectionData,
   useFirestoreDocData,
@@ -48,10 +49,12 @@ interface Props extends RouteComponentProps {
 
 const Channel: FunctionComponent<Props> = (props) => {
   const user: any = useUser();
+  const auth = useAuth();
   const { dispatch } = useContext(StoreContext);
   const classes = useStyles();
 
   const [message, setMessage] = useState("");
+  const [token, setToken] = useState("");
   const messageBoxRef: any = useRef();
 
   const serverRef = useFirestore().collection("Server").doc(props.serverId);
@@ -65,26 +68,44 @@ const Channel: FunctionComponent<Props> = (props) => {
 
   const sendMessage = () => {
     if (!message) return;
-    const body = {
-      serverId: props.serverId,
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    myHeaders.append("Authorization", token);
+
+    var raw = JSON.stringify({
       channelId: props.channelId,
+      serverId: props.serverId,
       message,
-      userName: user.displayName,
-    };
-    fetch("https://us-central1-beecon-d2a75.cloudfunctions.net/addMessage", {
-      method: "POST",
-      mode: "cors",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
     });
+    setMessage("");
+
+    var requestOptions: any = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+
+    fetch(
+      "https://us-central1-beecon-d2a75.cloudfunctions.net/webApi/api/v1/message",
+      requestOptions
+    )
+      .then((response) => response.text())
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => console.log("error", error));
   };
 
   useEffect(() => {
-    console.log(user);
+    auth.currentUser?.getIdToken().then((r) => {
+      setToken(r);
+    });
+  }, [auth]);
+
+  useEffect(() => {
     dispatch({ type: "SCROLL_MAIN_REF" });
-  }, []);
+  }, [messages]);
 
   return (
     <AuthCheck fallback={<Login />}>
@@ -92,8 +113,8 @@ const Channel: FunctionComponent<Props> = (props) => {
         <S.Title data-testid="channel-title">{channel.ChannelName}</S.Title>
       </S.TitleRow>
       <List className={classes.root}>
-        {messages.map((m) => (
-          <ListItem alignItems="flex-start">
+        {messages.map((m, i) => (
+          <ListItem alignItems="flex-start" key={i}>
             <ListItemAvatar>
               <Avatar>{m.userName.slice(0, 1)}</Avatar>
             </ListItemAvatar>
