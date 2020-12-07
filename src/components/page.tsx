@@ -1,5 +1,5 @@
 import { RouteComponentProps } from "@reach/router";
-import React, { FunctionComponent, Suspense, useEffect } from "react";
+import React, { FunctionComponent, useEffect } from "react";
 import { CircleLoader } from "react-spinners";
 import { SuspenseWithPerf } from "reactfire";
 import { G } from ".";

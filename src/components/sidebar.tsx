@@ -1,11 +1,7 @@
 import { Link } from "@reach/router";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { push as Menu } from "react-burger-menu";
-import {
-  useFirestore,
-  useFirestoreCollection,
-  useFirestoreCollectionData,
-} from "reactfire";
+import { useFirestore, useFirestoreCollectionData } from "reactfire";
 import styled from "styled-components";
 import { StoreContext } from "../store";
 
@@ -14,10 +10,6 @@ const Sidebar = (props: any) => {
 
   const serverRef = useFirestore().collection("Server");
   const serverList = useFirestoreCollectionData(serverRef);
-
-  useEffect(() => {
-    console.log(props, state, serverList);
-  }, [props, state, serverList]);
 
   return (
     <div className="left">
@@ -33,8 +25,8 @@ const Sidebar = (props: any) => {
       >
         <div style={{ height: "100%" }}>
           <S.Sidebar>
-            {serverList.map((s: any) => (
-              <Link className="text-light" to={`/server/${s.id}`}>
+            {serverList.map((s: any, i) => (
+              <Link className="text-light" to={`/server/${s.id}`} key={i}>
                 {s.ServerName}
               </Link>
             ))}

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState } from "react";
+import React, { FunctionComponent, useState } from "react";
 import { Link, RouteComponentProps } from "@reach/router";
 import * as uuid from "uuid";
 import {
@@ -27,11 +27,6 @@ const Server: FunctionComponent<Props> = (props) => {
     const newChannelId = uuid.v4();
     channelRef.doc(newChannelId).set({ ChannelName, id: newChannelId });
   };
-
-  useEffect(() => {
-    console.log(server);
-    console.log(channelList);
-  }, []);
 
   return (
     <AuthCheck fallback={<Login />}>

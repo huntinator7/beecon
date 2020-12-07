@@ -16,7 +16,8 @@ export const Routes: FunctionComponent<any> = (props) => {
 
   useEffect(() => {
     dispatch({ type: "SET_MAIN_REF", mainRef });
-  }, []);
+  }, [dispatch]);
+
   return (
     <G.Container id="global-container">
       <G.Navbar {...props} />

@@ -32,23 +32,25 @@ export const webApi = functions.https.onRequest(main);
 
 app.post("/message", async (req, res) => {
   const idToken = req.headers.authorization;
-  console.log(idToken);
 
   const user = await admin.auth().verifyIdToken(idToken ?? "");
   if (!user) {
+    console.log(`Auth Failed, idToken: ${idToken}`);
     res.status(403).send(`Unable to authenticate user`);
     return;
   }
 
   if (!req.body?.serverId || typeof req.body?.serverId !== "string") {
+    console.log(`Server ID Bad, received ${req.body?.serverId}`);
     res.json({ result: "Server ID not valid" });
     return;
   }
   if (!req.body?.channelId || typeof req.body?.channelId !== "string") {
+    console.log(`Channel ID Bad, received ${req.body?.channelId}`);
     res.json({ result: "Channel ID not valid" });
     return;
   }
-  
+
   const newMessageId = uuid.v4();
   const channelRef = db
     .collection("Server")
@@ -68,7 +70,7 @@ app.post("/message", async (req, res) => {
       userName: user.name,
     })
     .then(() => {
-      if (channelDiscordUrl) {
+      if (channelDiscordUrl && req.body?.sendToDiscord === true) {
         fetch(channelDiscordUrl, {
           method: "POST",
           headers: {

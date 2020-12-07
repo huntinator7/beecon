@@ -1,19 +1,18 @@
 import React, {
   FunctionComponent,
+  useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
 } from "react";
 import { RouteComponentProps } from "@reach/router";
-import * as uuid from "uuid";
 import {
   AuthCheck,
   useAuth,
   useFirestore,
   useFirestoreCollectionData,
   useFirestoreDocData,
-  useUser,
 } from "reactfire";
 import styled from "styled-components";
 import {
@@ -30,6 +29,7 @@ import {
 import { formatRelative } from "date-fns";
 import { StoreContext } from "../store";
 import Login from "./Login";
+import { useSocket } from "../hooks/socket";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -48,21 +48,50 @@ interface Props extends RouteComponentProps {
 }
 
 const Channel: FunctionComponent<Props> = (props) => {
-  const user: any = useUser();
   const auth = useAuth();
+
   const { dispatch } = useContext(StoreContext);
+
   const classes = useStyles();
 
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<any[]>([]);
+  const [discMessages, setDiscMessages] = useState<any[]>([]);
+  const [dm, sdm] = useState<any[]>([]);
+  const addNewDiscMsg = useCallback(
+    (newMsg: any) => {
+      console.log("IN ADD NEW DISC");
+      setDiscMessages([...discMessages, newMsg]);
+    },
+    [discMessages]
+  );
+  const cleanSetDiscMsgs = (newMsgs: any) => {
+    console.log("IN CLEAN SET DISC");
+    console.log(discMessages);
+    console.log(newMsgs);
+    setDiscMessages(newMsgs);
+    sdm(newMsgs.slice(0, -1));
+    console.log(discMessages);
+  };
+  const [fbCleanMessages, setFbCleanMessages] = useState<any[]>([]);
   const [token, setToken] = useState("");
+  const [sendToDiscord, setSendToDiscord] = useState(true);
+
   const messageBoxRef: any = useRef();
 
   const serverRef = useFirestore().collection("Server").doc(props.serverId);
   const channelRef = serverRef.collection("Channel").doc(props.channelId);
   const messagesRef = channelRef.collection("Message");
 
+  const { sendSocketMessage } = useSocket(
+    props.serverId ?? "testing",
+    props.channelId ?? "testing",
+    addNewDiscMsg,
+    cleanSetDiscMsgs
+  );
+
   const channel: any = useFirestoreDocData(channelRef);
-  const messages: any[] = useFirestoreCollectionData(
+  const fbMessages: any[] = useFirestoreCollectionData(
     messagesRef.orderBy("timeSent")
   );
 
@@ -76,6 +105,7 @@ const Channel: FunctionComponent<Props> = (props) => {
       channelId: props.channelId,
       serverId: props.serverId,
       message,
+      sendToDiscord,
     });
     setMessage("");
 
@@ -93,9 +123,27 @@ const Channel: FunctionComponent<Props> = (props) => {
       .then((response) => response.text())
       .then((result) => {
         console.log(result);
+        sendSocketMessage(message);
       })
       .catch((error) => console.log("error", error));
   };
+
+  useEffect(() => {
+    const s = [...fbCleanMessages, ...dm]
+      .filter((m) => !!m)
+      .sort((a, b) => (a.timeSent < b.timeSent ? -1 : 1));
+    console.log(s);
+    setMessages(s);
+  }, [fbCleanMessages, dm]);
+
+  useEffect(() => {
+    sdm([...dm, discMessages.pop()]);
+  }, [discMessages]);
+
+  useEffect(() => {
+    console.log("DISC: ", discMessages);
+    console.log("dm: ", dm);
+  }, [discMessages, dm]);
 
   useEffect(() => {
     auth.currentUser?.getIdToken().then((r) => {
@@ -104,19 +152,38 @@ const Channel: FunctionComponent<Props> = (props) => {
   }, [auth]);
 
   useEffect(() => {
+    setFbCleanMessages(
+      fbMessages.map((m) => ({
+        ...m,
+        timeSent: m.timeSent.toDate(),
+      }))
+    );
+  }, [fbMessages]);
+
+  useEffect(() => {
     dispatch({ type: "SCROLL_MAIN_REF" });
-  }, [messages]);
+  }, [dispatch, messages]);
 
   return (
     <AuthCheck fallback={<Login />}>
       <S.TitleRow>
         <S.Title data-testid="channel-title">{channel.ChannelName}</S.Title>
+        <label>Send to Discord</label>
+        <input
+          type="checkbox"
+          checked={sendToDiscord}
+          onChange={(e) => setSendToDiscord(!sendToDiscord)}
+        />
       </S.TitleRow>
       <List className={classes.root}>
         {messages.map((m, i) => (
           <ListItem alignItems="flex-start" key={i}>
             <ListItemAvatar>
-              <Avatar>{m.userName.slice(0, 1)}</Avatar>
+              {m?.avatar ? (
+                <Avatar src={m.avatar} />
+              ) : (
+                <Avatar>{m.userName.slice(0, 1)}</Avatar>
+              )}
             </ListItemAvatar>
             <ListItemText
               primary={
@@ -136,7 +203,7 @@ const Channel: FunctionComponent<Props> = (props) => {
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    {formatRelative(m.timeSent.toDate(), new Date())}
+                    {formatRelative(m.timeSent, new Date())}
                   </Typography>
                 </>
               }
