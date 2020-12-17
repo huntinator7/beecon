@@ -1,6 +1,0 @@
-{
-  "functions": {
-    "source": ".",
-    "predeploy": ["npm run build"]
-  }
-}

@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   inline: {
     display: "inline",
+    whiteSpace: "pre-wrap",
   },
 }));
 
@@ -92,7 +93,7 @@ const Channel: FunctionComponent<Props> = (props) => {
 
   const channel: any = useFirestoreDocData(channelRef);
   const fbMessages: any[] = useFirestoreCollectionData(
-    messagesRef.orderBy("timeSent")
+    messagesRef.orderBy("timeSent").limitToLast(30)
   );
 
   const sendMessage = () => {
@@ -224,13 +225,18 @@ const Channel: FunctionComponent<Props> = (props) => {
       <S.SendMessage>
         <TextField
           inputRef={messageBoxRef}
+          multiline
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
+          onChange={(e) => {
+            setMessage(e.target.value);
+          }}
+          onKeyUp={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
               sendMessage();
+              e.preventDefault();
             }
           }}
+          style={{ flexGrow: 1 }}
         />
         <Button onClick={sendMessage}>Send</Button>
       </S.SendMessage>
@@ -269,5 +275,6 @@ const S = {
     background-color: #ffbe30;
     bottom: 0px;
     padding: 10px 20px;
+    display: flex;
   `,
 };

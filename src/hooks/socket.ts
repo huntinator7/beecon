@@ -4,7 +4,7 @@ import { io } from "socket.io-client/build/index";
 let socket: any;
 
 export const initiateSocket = (room: any) => {
-  socket = io("http://42cbc3da77ec.ngrok.io");
+  socket = io("https://beecon-discord-bot-pgxownozfa-uc.a.run.app");
   console.log(`Connecting socket...`);
   if (socket && room) socket.emit("join", room);
 };
