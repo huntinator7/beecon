@@ -101,6 +101,7 @@ const Channel: FunctionComponent<Props> = (props) => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
     myHeaders.append("Authorization", token);
+    myHeaders.append("Cache-Control", "no-cache");
 
     var raw = JSON.stringify({
       channelId: props.channelId,
