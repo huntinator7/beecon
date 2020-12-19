@@ -1,15 +1,32 @@
 import { Link } from "@reach/router";
-import React, { useContext } from "react";
+import { User } from "firebase";
+import React, { useContext, useEffect } from "react";
 import { push as Menu } from "react-burger-menu";
-import { useFirestore, useFirestoreCollectionData } from "reactfire";
+import {
+  useFirestore,
+  useFirestoreCollectionData,
+  useFirestoreDocData,
+  useUser,
+} from "reactfire";
 import styled from "styled-components";
 import { StoreContext } from "../store";
 
-const Sidebar = (props: any) => {
+const Sidebar = (_props: any) => {
   const { state } = useContext(StoreContext);
+  const user: User = useUser();
+  const db = useFirestore();
 
-  const serverRef = useFirestore().collection("Server");
+  const userRef = db.collection("User").doc(user.uid);
+  const userFS: any = useFirestoreDocData(userRef);
+
+  const serverRef = db
+    .collection("Server")
+    .where("id", "in", userFS?.servers || ["a"]);
   const serverList = useFirestoreCollectionData(serverRef);
+
+  useEffect(() => {
+    console.log(user, userFS);
+  }, [user, userFS]);
 
   return (
     <div className="left">

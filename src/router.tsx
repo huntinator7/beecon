@@ -13,6 +13,26 @@ import Login from "./pages/Login";
 export const Routes: FunctionComponent<any> = (props) => {
   const { dispatch } = useContext(StoreContext);
   const mainRef = useRef();
+  // const firebase = useFirebaseApp();
+
+  useEffect(() => {
+    // console.log(messaging);
+    // async function checkNotification() {
+    //   const token = await firebase.messaging().getToken();
+    //   console.log(token);
+    //   Notification.requestPermission()
+    //     .then(() => {
+    //       return firebase.messaging().getToken();
+    //     })
+    //     .then((token) => {
+    //       console.log(token);
+    //     })
+    //     .catch((e) => {
+    //       console.error(e);
+    //     });
+    // }
+    // checkNotification();
+  }, []);
 
   useEffect(() => {
     dispatch({ type: "SET_MAIN_REF", mainRef });

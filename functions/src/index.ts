@@ -89,3 +89,97 @@ app.post("/message", async (req, res) => {
       res.status(400).send(`Error creating message: ${e}`);
     });
 });
+
+app.post("/server", async (req, res) => {
+  const idToken = req.headers.authorization;
+
+  const user = await admin.auth().verifyIdToken(idToken ?? "");
+  if (!user) {
+    console.log(`Auth Failed, idToken: ${idToken}`);
+    res.status(403).send(`Unable to authenticate user`);
+    return;
+  }
+
+  if (!req.body?.serverName || typeof req.body?.serverName !== "string") {
+    console.log(`Server Name Bad, received ${req.body?.serverName}`);
+    res.json({ result: "Server Name not valid" });
+    return;
+  }
+
+  const serversRef = db.collection("Server");
+  const newServerId = uuid.v4();
+
+  serversRef
+    .doc(newServerId)
+    .set({ ServerName: req.body.serverName, id: newServerId })
+    .then(() => {
+      const newChannelId = uuid.v4();
+      serversRef.doc(newServerId).collection("Channel").doc(newChannelId).set({
+        ChannelName: "General",
+        id: newChannelId,
+      });
+      serversRef.doc(newServerId).collection("User").doc(user.uid).set({
+        isAdmin: true,
+      });
+      db.collection("User")
+        .doc(user.uid)
+        .set({ servers: admin.firestore.FieldValue.arrayUnion(newServerId) });
+    });
+});
+
+app.post("/channel", async (req, res) => {
+  // verify user exists
+  const idToken = req.headers.authorization;
+  const user = await admin.auth().verifyIdToken(idToken ?? "");
+  if (!user) {
+    console.log(`Auth Failed, idToken: ${idToken}`);
+    res.status(403).send(`Unable to authenticate user`);
+    return;
+  }
+
+  // verify props
+  if (!req.body?.serverId || typeof req.body?.serverId !== "string") {
+    console.log(`Server ID Bad, received ${req.body?.serverId}`);
+    res.json({ result: "Server ID not valid" });
+    return;
+  }
+  if (!req.body?.channelName || typeof req.body?.channelName !== "string") {
+    console.log(`Channel Name Bad, received ${req.body?.channelName}`);
+    res.json({ result: "Channel Name not valid" });
+    return;
+  }
+
+  // verify user is server Admin
+  const serverRef = db.collection("Server").doc(req.body.serverId);
+  const serverUser = await serverRef.collection("User").doc(user.uid).get();
+  if (!serverUser) {
+    console.log(`Channel Name Bad, received ${req.body?.channelName}`);
+    res.json({ result: "Channel Name not valid" });
+    return;
+  }
+  if (!serverUser.get("isAdmin")) {
+    console.log(`User is not a server admin`);
+    res.json({ result: "User is not a server admin" });
+    return;
+  }
+
+  // create channel
+  const channelRef = serverRef.collection("Channel");
+  const newChannelId = uuid.v4();
+  const newChannelInfo = {
+    ChannelName: req.body.channelName,
+    id: newChannelId,
+    ...(req.body?.discordWebhookUrl && {
+      discord_webhook_url: req.body.discordWebhookUrl,
+    }),
+    ...(req.body?.discordChannelId && {
+      discord_channel_id: req.body.discordChannelId,
+    }),
+  };
+  console.log(newChannelInfo);
+  channelRef.doc(newChannelId).set(newChannelInfo);
+});
+
+export const onUserCreate = functions.auth.user().onCreate((user) => {
+  db.collection("User").doc(user.uid).set({ servers: [] });
+});

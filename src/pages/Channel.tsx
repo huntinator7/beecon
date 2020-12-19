@@ -75,7 +75,6 @@ const Channel: FunctionComponent<Props> = (props) => {
     console.log(discMessages);
   };
   const [fbCleanMessages, setFbCleanMessages] = useState<any[]>([]);
-  const [token, setToken] = useState("");
   const [sendToDiscord, setSendToDiscord] = useState(true);
 
   const messageBoxRef: any = useRef();
@@ -96,14 +95,15 @@ const Channel: FunctionComponent<Props> = (props) => {
     messagesRef.orderBy("timeSent").limitToLast(30)
   );
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!message) return;
+    const token = await auth.currentUser?.getIdToken();
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", token);
+    myHeaders.append("Authorization", token ?? "");
     myHeaders.append("Cache-Control", "no-cache");
 
-    var raw = JSON.stringify({
+    var body = JSON.stringify({
       channelId: props.channelId,
       serverId: props.serverId,
       message,
@@ -114,7 +114,7 @@ const Channel: FunctionComponent<Props> = (props) => {
     var requestOptions: any = {
       method: "POST",
       headers: myHeaders,
-      body: raw,
+      body,
       redirect: "follow",
     };
 
@@ -146,12 +146,6 @@ const Channel: FunctionComponent<Props> = (props) => {
     console.log("DISC: ", discMessages);
     console.log("dm: ", dm);
   }, [discMessages, dm]);
-
-  useEffect(() => {
-    auth.currentUser?.getIdToken().then((r) => {
-      setToken(r);
-    });
-  }, [auth]);
 
   useEffect(() => {
     setFbCleanMessages(
