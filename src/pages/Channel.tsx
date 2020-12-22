@@ -92,7 +92,7 @@ const Channel: FunctionComponent<Props> = (props) => {
 
   const channel: any = useFirestoreDocData(channelRef);
   const fbMessages: any[] = useFirestoreCollectionData(
-    messagesRef.orderBy("timeSent").limitToLast(30)
+    messagesRef.orderBy("timeSent").limitToLast(50)
   );
 
   const sendMessage = async () => {
@@ -162,79 +162,81 @@ const Channel: FunctionComponent<Props> = (props) => {
 
   return (
     <AuthCheck fallback={<Login />}>
-      <S.TitleRow>
-        <S.Title data-testid="channel-title">{channel.ChannelName}</S.Title>
-        <label>Send to Discord</label>
-        <input
-          type="checkbox"
-          checked={sendToDiscord}
-          onChange={(e) => setSendToDiscord(!sendToDiscord)}
-        />
-      </S.TitleRow>
-      <List className={classes.root}>
-        {messages.map((m, i) => (
-          <ListItem alignItems="flex-start" key={i}>
-            <ListItemAvatar>
-              {m?.avatar ? (
-                <Avatar src={m.avatar} />
-              ) : (
-                <Avatar>{m.userName.slice(0, 1)}</Avatar>
-              )}
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <>
+      <S.Container>
+        <S.TitleRow>
+          <S.Title data-testid="channel-title">{channel.ChannelName}</S.Title>
+          <label>Send to Discord</label>
+          <input
+            type="checkbox"
+            checked={sendToDiscord}
+            onChange={(e) => setSendToDiscord(!sendToDiscord)}
+          />
+        </S.TitleRow>
+        <List className={classes.root}>
+          {messages.map((m, i) => (
+            <ListItem alignItems="flex-start" key={i}>
+              <ListItemAvatar>
+                {m?.avatar ? (
+                  <Avatar src={m.avatar} />
+                ) : (
+                  <Avatar>{m.userName.slice(0, 1)}</Avatar>
+                )}
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <>
+                    <Typography
+                      component="span"
+                      variant="h5"
+                      className={classes.inline}
+                      color="textPrimary"
+                      style={{ marginRight: "20px" }}
+                    >
+                      {m.userName}
+                    </Typography>
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      className={classes.inline}
+                      color="textPrimary"
+                    >
+                      {formatRelative(m.timeSent, new Date())}
+                    </Typography>
+                  </>
+                }
+                secondary={
                   <Typography
                     component="span"
-                    variant="h5"
-                    className={classes.inline}
-                    color="textPrimary"
-                    style={{ marginRight: "20px" }}
-                  >
-                    {m.userName}
-                  </Typography>
-                  <Typography
-                    component="span"
-                    variant="body2"
+                    variant="body1"
                     className={classes.inline}
                     color="textPrimary"
                   >
-                    {formatRelative(m.timeSent, new Date())}
+                    {m.message}
                   </Typography>
-                </>
+                }
+              />
+            </ListItem>
+          ))}
+        </List>
+        <S.SendMessage>
+          <TextField
+            inputRef={messageBoxRef}
+            multiline
+            value={message}
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+            onKeyUp={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                sendMessage();
+                e.preventDefault();
               }
-              secondary={
-                <Typography
-                  component="span"
-                  variant="body1"
-                  className={classes.inline}
-                  color="textPrimary"
-                >
-                  {m.message}
-                </Typography>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
-      <S.SendMessage>
-        <TextField
-          inputRef={messageBoxRef}
-          multiline
-          value={message}
-          onChange={(e) => {
-            setMessage(e.target.value);
-          }}
-          onKeyUp={(e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-              sendMessage();
-              e.preventDefault();
-            }
-          }}
-          style={{ flexGrow: 1 }}
-        />
-        <Button onClick={sendMessage}>Send</Button>
-      </S.SendMessage>
+            }}
+            style={{ flexGrow: 1 }}
+          />
+          <Button onClick={sendMessage}>Send</Button>
+        </S.SendMessage>
+      </S.Container>
     </AuthCheck>
   );
 };
@@ -242,6 +244,17 @@ const Channel: FunctionComponent<Props> = (props) => {
 export default Channel;
 
 const S = {
+  Container: styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-self: center;
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+    }
+  `,
   Title: styled.h1`
     color: #242f40;
   `,

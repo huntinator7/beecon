@@ -21,14 +21,17 @@ interface Props extends RouteComponentProps {
 const Server: FunctionComponent<Props> = (props) => {
   const auth = useAuth();
   const user: User = useUser();
+  const firestore = useFirestore();
+
   const [channelName, setChannelName] = useState("");
   const [discordWebhookUrl, setDiscordWebhookUrl] = useState("");
   const [discordChannelId, setDiscordChannelId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
 
-  const serverRef = useFirestore().collection("Server").doc(props.serverId);
+  const serverRef = firestore.collection("Server").doc(props.serverId);
   const channelListRef = serverRef.collection("Channel");
   const userServerRef = serverRef.collection("User").doc(user.uid);
+
   const server: any = useFirestoreDocData(serverRef);
   const channelList: any[] = useFirestoreCollectionData(channelListRef);
   const userServer: any = useFirestoreDocData(userServerRef);
@@ -55,7 +58,7 @@ const Server: FunctionComponent<Props> = (props) => {
     };
 
     fetch(
-      "https://us-central1-beecon-d2a75.cloudfunctions.net/webApi/api/v1/channel",
+      "https://us-central1-beecon-d2a75.cloudfunctions.net/webApi/api/v1/channel/create",
       requestOptions
     )
       .then((response) => response.text())
@@ -77,34 +80,36 @@ const Server: FunctionComponent<Props> = (props) => {
   return (
     <AuthCheck fallback={<Login />}>
       <S.Container>
-        <S.TitleRow>
-          <S.Title data-testid="server-title">{server.ServerName}</S.Title>
-        </S.TitleRow>
+        <h1 data-testid="server-title">{server.ServerName}</h1>
+        <S.Subtitle>Channels</S.Subtitle>
         <S.ChannelList>
           {channelList.map((c) => (
             <Link to={c.id}>{c.ChannelName}</Link>
           ))}
         </S.ChannelList>
         {isAdmin ? (
-          <S.CreateChannel>
-            <h3>New Channel</h3>
-            <input
-              value={channelName}
-              onChange={(e) => setChannelName(e.target.value)}
-              placeholder="Channel Name"
-            />
-            <input
-              value={discordWebhookUrl}
-              onChange={(e) => setDiscordWebhookUrl(e.target.value)}
-              placeholder="Discord Webhook URL (optional)"
-            />
-            <input
-              value={discordChannelId}
-              onChange={(e) => setDiscordChannelId(e.target.value)}
-              placeholder="Discord Channel ID (optional)"
-            />
-            <button onClick={addChannel}>Create</button>
-          </S.CreateChannel>
+          <>
+            <S.Subtitle>Admin Functions</S.Subtitle>
+            <S.CreateChannel>
+              <h3>Create New Channel</h3>
+              <input
+                value={channelName}
+                onChange={(e) => setChannelName(e.target.value)}
+                placeholder="Channel Name"
+              />
+              <input
+                value={discordWebhookUrl}
+                onChange={(e) => setDiscordWebhookUrl(e.target.value)}
+                placeholder="Discord Webhook URL (optional)"
+              />
+              <input
+                value={discordChannelId}
+                onChange={(e) => setDiscordChannelId(e.target.value)}
+                placeholder="Discord Channel ID (optional)"
+              />
+              <button onClick={addChannel}>Create</button>
+            </S.CreateChannel>
+          </>
         ) : (
           <></>
         )}
@@ -143,7 +148,15 @@ const C_2 = {
     flex-direction: column;
     padding: 20px;
     margin: 10px;
-    max-width: 80vw;
+    background-color: #dddfe4;
+    border: 5px solid #242f40;
+    border-radius: 15px;
+    > * {
+      margin-bottom: 10px;
+      &:last-child {
+        margin-bottom: 0px;
+      }
+    }
   `,
 };
 
@@ -152,42 +165,39 @@ const C = { ...C_1, ...C_2 };
 const S = {
   Container: styled.div`
     width: 500px;
-  `,
-  Title: styled.h1`
-    margin-left: 10px;
-  `,
-  Subtitle: styled.h5`
-    margin-left: 20px;
-  `,
-  TitleRow: styled.div`
+    max-width: 100vw;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center;
+    justify-self: center;
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      color: #242f40;
+    }
+  `,
+  Title: styled.h1``,
+  Subtitle: styled.h2`
+    margin: 10px 0px 0px;
   `,
   ChannelList: styled.div`
     ${C.List}
     > a {
       ${C.Button}
-      margin-bottom: 20px;
     }
   `,
   CreateChannel: styled.div`
     ${C.List}
-    background-color: #dddfe4;
-    border: 5px solid #242f40;
-    border-radius: 15px;
-    > input {
+    > input, select {
       ${C.FormElement}
       background-color: #ffffff;
-      margin-bottom: 10px;
     }
     > button {
       ${C.Button}
     }
     > h3 {
-      font-size: 2em;
-      text-align: center;
-      margin: 0px 0px 20px;
+      margin-top: 0px;
     }
   `,
 };

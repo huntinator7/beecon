@@ -29,7 +29,7 @@ const Home: FunctionComponent<Props> = (_props) => {
     };
 
     fetch(
-      "https://us-central1-beecon-d2a75.cloudfunctions.net/webApi/api/v1/server",
+      "https://us-central1-beecon-d2a75.cloudfunctions.net/webApi/api/v1/server/create",
       requestOptions
     )
       .then((response) => response.text())
@@ -41,12 +41,14 @@ const Home: FunctionComponent<Props> = (_props) => {
 
   return (
     <AuthCheck fallback={<Login />}>
-      <S.Title>Welcome To Beecon</S.Title>
-      <input
-        value={serverName}
-        onChange={(e) => setServerName(e.target.value)}
-      />
-      <button onClick={createServer}>Create Server</button>
+      <S.Container>
+        <h1>Welcome To Beecon</h1>
+        <input
+          value={serverName}
+          onChange={(e) => setServerName(e.target.value)}
+        />
+        <button onClick={createServer}>Create Server</button>
+      </S.Container>
     </AuthCheck>
   );
 };
@@ -55,4 +57,16 @@ export default Home;
 
 const S = {
   Title: styled.h1``,
+  Container: styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-self: center;
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      color: #242f40;
+    }
+  `,
 };

@@ -52,7 +52,12 @@ export const Routes: FunctionComponent<any> = (props) => {
           fallback={<CircleLoader />}
           traceId={props.uri ?? "traceId"}
         >
-          <Router>
+          <Router
+            style={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
             <Home path="/" />
             <Login path="/login" />
             <Server path="/server/:serverId" />
