@@ -10,7 +10,7 @@ import {
 } from "reactfire";
 import styled, { css } from "styled-components";
 import "firebase/firestore";
-import Login from "./Login";
+import Login from "../components/login";
 import { User } from "firebase";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { Snackbar } from "@material-ui/core";
@@ -89,10 +89,6 @@ const Server: FunctionComponent<Props> = (props) => {
     }
   }, [server]);
 
-  useEffect(() => {
-    console.log("Help");
-  });
-
   return (
     <AuthCheck fallback={<Login />}>
       <S.Container>
@@ -107,7 +103,7 @@ const Server: FunctionComponent<Props> = (props) => {
           text={`${window.location.href}/join/${joinCode}`}
           onCopy={() => setCopied(true)}
         >
-          <button>Copy Join Code</button>
+          <S.JoinButton>Copy Join Code</S.JoinButton>
         </CopyToClipboard>
         <Snackbar
           open={copied}
@@ -230,5 +226,10 @@ const S = {
     > h3 {
       margin-top: 0px;
     }
+  `,
+  JoinButton: styled.button`
+    ${C.Button};
+    font-size: 1em;
+    margin: 10px;
   `,
 };

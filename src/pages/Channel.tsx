@@ -28,7 +28,7 @@ import {
 } from "@material-ui/core";
 import { formatRelative } from "date-fns";
 import { StoreContext } from "../store";
-import Login from "./Login";
+import Login from "../components/login";
 import { useSocket } from "../hooks/socket";
 
 const useStyles = makeStyles((theme) => ({

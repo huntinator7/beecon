@@ -9,11 +9,14 @@ export const createMessage = async (req: any, res: Response) => {
   const { body, user } = req;
 
   const newMessageId = uuid.v4();
-  const channelRef = db
-    .collection("Server")
-    .doc(body.serverId)
-    .collection("Channel")
-    .doc(body.channelId);
+  const serverRef = db.collection("Server").doc(body.serverId);
+
+  const serverUserRef = serverRef.collection("User").doc(user.uid);
+  const serverUser = await serverUserRef.get();
+  const suNickName = serverUser.get("nickName");
+  const suPicture = serverUser.get("photoURL");
+
+  const channelRef = serverRef.collection("Channel").doc(body.channelId);
   const channel = await channelRef.get();
   const channelDiscordUrl = channel.get("discord_webhook_url");
 
@@ -34,8 +37,8 @@ export const createMessage = async (req: any, res: Response) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            username: user.name,
-            avatar_url: user.picture,
+            username: suNickName || user.name,
+            avatar_url: suPicture || user.picture,
             content: body.message,
           }),
         });

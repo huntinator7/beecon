@@ -3,7 +3,7 @@ import { navigate, RouteComponentProps } from "@reach/router";
 import { AuthCheck, useAuth } from "reactfire";
 import styled, { css } from "styled-components";
 import "firebase/firestore";
-import Login from "./Login";
+import Login from "../components/login";
 
 interface Props extends RouteComponentProps {
   serverId?: string;
