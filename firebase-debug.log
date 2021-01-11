@@ -1,0 +1,29 @@
+[debug] [2020-12-23T23:52:46.033Z] ----------------------------------------------------------------------
+[debug] [2020-12-23T23:52:46.035Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\huntinator7\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2020-12-23T23:52:46.036Z] CLI Version:   8.14.0
+[debug] [2020-12-23T23:52:46.036Z] Platform:      win32
+[debug] [2020-12-23T23:52:46.036Z] Node Version:  v12.6.0
+[debug] [2020-12-23T23:52:46.036Z] Time:          Wed Dec 23 2020 16:52:46 GMT-0700 (Mountain Standard Time)
+[debug] [2020-12-23T23:52:46.036Z] ----------------------------------------------------------------------
+[debug] [2020-12-23T23:52:46.036Z] 
+[debug] [2020-12-23T23:52:46.044Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-12-23T23:52:46.044Z] > authorizing via signed-in user
+[debug] [2020-12-23T23:52:46.044Z] [iam] checking project beecon-d2a75 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2020-12-23T23:52:46.047Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/beecon-d2a75:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]}
+[debug] [2020-12-23T23:52:46.164Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Wed, 23 Dec 2020 23:52:46 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=52","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-12-23T23:52:46.166Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/beecon-d2a75/serviceAccounts/beecon-d2a75@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-12-23T23:52:46.314Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Wed, 23 Dec 2020 23:52:46 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-12-23T23:52:46.315Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/beecon-d2a75  
+ 
+[debug] [2020-12-23T23:52:46.660Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Wed, 23 Dec 2020 23:52:47 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[warn] !  functions: package.json indicates an outdated version of firebase-functions.
+Please upgrade using npm install --save firebase-functions@latest in your functions directory. 
+[info] 
+[info] === Deploying to 'beecon-d2a75'...
+[info] 
+[info] i  deploying storage, functions, hosting 
+[info] Running command: npm run build --prefix ./functions
+[info] +  functions: Finished running predeploy script. 
+[info] Running command: npm run build

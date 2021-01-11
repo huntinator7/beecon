@@ -249,6 +249,7 @@ const S = {
     flex-direction: column;
     justify-content: center;
     justify-self: center;
+    width: 100%;
     h1,
     h2,
     h3 {

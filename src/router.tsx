@@ -1,14 +1,22 @@
 import { Router } from "@reach/router";
-import React, { FunctionComponent, useContext, useEffect, useRef } from "react";
+import React, {
+  FunctionComponent,
+  Suspense,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import Home from "./pages/Home";
 import Server from "./pages/Server";
 import Channel from "./pages/Channel";
-import { SuspenseWithPerf } from "reactfire";
+import { AuthCheck, SuspenseWithPerf } from "reactfire";
 import { G } from "./components";
 import { CircleLoader } from "react-spinners";
 import styled from "styled-components";
 import { StoreContext } from "./store";
 import Login from "./pages/Login";
+import ServerJoin from "./pages/ServerJoin";
+import { ErrorBoundary } from "./components/fbErrorCatcher";
 
 export const Routes: FunctionComponent<any> = (props) => {
   const { dispatch } = useContext(StoreContext);
@@ -45,24 +53,31 @@ export const Routes: FunctionComponent<any> = (props) => {
         fallback={<CircleLoader />}
         traceId={"sidebar-server-list"}
       >
-        <G.Sidebar {...props} />
+        <Suspense fallback="Loading...">
+          <AuthCheck fallback={<div />}>
+            <G.Sidebar {...props} />
+          </AuthCheck>
+        </Suspense>
       </SuspenseWithPerf>
       <S.Main ref={mainRef} id="page-wrapper">
         <SuspenseWithPerf
           fallback={<CircleLoader />}
           traceId={props.uri ?? "traceId"}
         >
-          <Router
-            style={{
-              display: "flex",
-              justifyContent: "center",
-            }}
-          >
-            <Home path="/" />
-            <Login path="/login" />
-            <Server path="/server/:serverId" />
-            <Channel path="/server/:serverId/:channelId" />
-          </Router>
+          <ErrorBoundary>
+            <Router
+              style={{
+                display: "flex",
+                justifyContent: "center",
+              }}
+            >
+              <Home path="/" />
+              <Login path="/login" />
+              <Server path="/server/:serverId" />
+              <ServerJoin path="/server/:serverId/join/:joinCode" />
+              <Channel path="/server/:serverId/:channelId" />
+            </Router>
+          </ErrorBoundary>
         </SuspenseWithPerf>
       </S.Main>
     </G.Container>

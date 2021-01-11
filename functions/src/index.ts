@@ -1,5 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+admin.initializeApp(functions.config().firebase);
 import express from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
@@ -9,7 +10,6 @@ import { createChannel } from "./endpoints/channel";
 import { createMessage } from "./endpoints/message";
 
 //initialize firebase inorder to access its services
-admin.initializeApp(functions.config().firebase);
 
 //initialize express server
 const app = express();
@@ -52,7 +52,7 @@ app.use(
   "/server/join",
   propCheck([
     { field: "serverId", label: "Server ID" },
-    { field: "userId", label: "User ID" },
+    { field: "joinCode", label: "Join Code" },
   ]) as any
 );
 app.post("/server/join", joinServerWithCode);

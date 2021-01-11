@@ -11,7 +11,7 @@ interface StoreState {
   mainRef: any;
 }
 
-const initialStore: StoreState = { sidebarOpen: true, mainRef: null };
+const initialStore: StoreState = { sidebarOpen: false, mainRef: null };
 
 function reducer(state: StoreState, action: StoreAction) {
   switch (action.type) {

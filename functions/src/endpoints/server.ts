@@ -21,20 +21,26 @@ export const createServer = async (req: any, res: Response) => {
     });
     db.collection("User")
       .doc(user.uid)
-      .set({ servers: admin.firestore.FieldValue.arrayUnion(newServerId) });
+      .update({ servers: admin.firestore.FieldValue.arrayUnion(newServerId) });
   });
 };
 
 export const joinServerWithCode = async (req: any, res: Response) => {
-  const { body } = req;
+  const { user, body } = req;
 
-  db.collection("Server")
-    .doc(body.serverId)
-    .collection("User")
-    .doc(body.userId)
-    .set({ isAdmin: false, uid: body.userId });
-
-  db.collection("User")
-    .doc(body.userId)
-    .set({ servers: admin.firestore.FieldValue.arrayUnion(body.serverId) });
+  const serverRef = db.collection("Server").doc(body.serverId);
+  const server = await serverRef.get();
+  const serverJoinCode = server.get("joinCode");
+  console.log(serverJoinCode, body.joinCode, body.joinCode === serverJoinCode);
+  if (body.joinCode === serverJoinCode) {
+    db.collection("User")
+      .doc(body.userId)
+      .update({
+        servers: admin.firestore.FieldValue.arrayUnion(body.serverId),
+      });
+    serverRef.collection("User").doc(user.uid).set({
+      isAdmin: false,
+      uid: user.uid,
+    });
+  }
 };
