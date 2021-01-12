@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
-import { navigate, RouteComponentProps } from "@reach/router";
+import { navigate, redirectTo, RouteComponentProps } from "@reach/router";
 import { AuthCheck, useAuth } from "reactfire";
 import styled, { css } from "styled-components";
 import "firebase/firestore";
@@ -14,6 +14,7 @@ const ServerJoin: FunctionComponent<Props> = (props) => {
   const auth = useAuth();
 
   const [joinText, setJoinText] = useState("Attempting to join server");
+  const [showError, setShowError] = useState(false);
 
   useEffect(() => {
     async function joinServerWithCode() {
@@ -50,9 +51,7 @@ const ServerJoin: FunctionComponent<Props> = (props) => {
         .catch((error) => {
           console.log("error", error);
           setJoinText("Unable to join server");
-          setTimeout(function () {
-            navigate(`/login`);
-          }, 3000);
+          setShowError(true);
         });
     }
     joinServerWithCode();
@@ -62,6 +61,11 @@ const ServerJoin: FunctionComponent<Props> = (props) => {
     <AuthCheck fallback={<Login />}>
       <S.Container>
         <h1 data-testid="join-text">{joinText}</h1>
+        {showError ? (
+          <button onClick={() => redirectTo("/")}>Return to home</button>
+        ) : (
+          <></>
+        )}
       </S.Container>
     </AuthCheck>
   );
