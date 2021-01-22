@@ -1,6 +1,5 @@
 import React, { FunctionComponent, useEffect, useState } from "react";
 import { Link, RouteComponentProps } from "@reach/router";
-import * as uuid from "uuid";
 import {
   AuthCheck,
   useAuth,

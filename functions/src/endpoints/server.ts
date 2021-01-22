@@ -9,32 +9,47 @@ export const createServer = async (req: any, res: Response) => {
   const newServerId = uuid.v4();
   const serverRef = db.collection("Server").doc(newServerId);
 
-  serverRef.set({ ServerName: body.serverName, id: newServerId }).then(() => {
-    const newChannelId = uuid.v4();
-    serverRef.collection("Channel").doc(newChannelId).set({
-      ChannelName: "General",
-      id: newChannelId,
+  serverRef
+    .set({ ServerName: body.serverName, id: newServerId })
+    .then(() => {
+      const newChannelId = uuid.v4();
+      serverRef.collection("Channel").doc(newChannelId).set({
+        ChannelName: "General",
+        id: newChannelId,
+      });
+      serverRef.collection("User").doc(user.uid).set({
+        isAdmin: true,
+        uid: user.uid,
+      });
+      db.collection("User")
+        .doc(user.uid)
+        .set({ servers: admin.firestore.FieldValue.arrayUnion(newServerId) });
+      res.status(201).send(`Successfully created server ${body.serverName}`);
+    })
+    .catch(() => {
+      res.status(400).send(`Unable to create server ${body.serverName}`);
     });
-    serverRef.collection("User").doc(user.uid).set({
-      isAdmin: true,
-      uid: user.uid,
-    });
-    db.collection("User")
-      .doc(user.uid)
-      .set({ servers: admin.firestore.FieldValue.arrayUnion(newServerId) });
-  });
 };
 
 export const joinServerWithCode = async (req: any, res: Response) => {
   const { body } = req;
 
-  db.collection("Server")
-    .doc(body.serverId)
-    .collection("User")
-    .doc(body.userId)
-    .set({ isAdmin: false, uid: body.userId });
+  const serverRef = db.collection("Server").doc(body.serverId);
+  const server = await serverRef.get();
+  const serverJoinCode = server.get("joinCode");
 
-  db.collection("User")
-    .doc(body.userId)
-    .set({ servers: admin.firestore.FieldValue.arrayUnion(body.serverId) });
+  if (serverJoinCode === body.joinCode) {
+    serverRef
+      .collection("User")
+      .doc(body.userId)
+      .set({ isAdmin: false, uid: body.userId });
+
+    db.collection("User")
+      .doc(body.userId)
+      .set({ servers: admin.firestore.FieldValue.arrayUnion(body.serverId) });
+
+    res.status(201).send("Successfully joined server");
+  } else {
+    res.status(40).send("Unable to join server with this code.");
+  }
 };

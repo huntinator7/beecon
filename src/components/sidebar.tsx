@@ -16,7 +16,7 @@ const Sidebar = (_props: any) => {
   const user: User = useUser();
   const db = useFirestore();
 
-  const userRef = db.collection("User").doc(user.uid);
+  const userRef = db.collection("User").doc(user?.uid || "a");
   const userFS: any = useFirestoreDocData(userRef);
 
   const serverRef = db
