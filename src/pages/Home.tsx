@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState } from "react";
 import { RouteComponentProps } from "@reach/router";
 import styled from "styled-components";
 import { AuthCheck, useAuth } from "reactfire";
-import Login from "./Login";
+import Login from "../components/login";
 
 interface Props extends RouteComponentProps {}
 

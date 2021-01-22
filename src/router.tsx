@@ -1,17 +1,21 @@
-import React, { FunctionComponent, useContext, useEffect, useRef } from "react";
 import { Router } from "@reach/router";
-import { SuspenseWithPerf } from "reactfire";
-import { CircleLoader } from "react-spinners";
-import styled from "styled-components";
-
-import { G } from "./components";
-import { StoreContext } from "./store";
+import React, {
+  FunctionComponent,
+  Suspense,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import Home from "./pages/Home";
 import Server from "./pages/Server";
 import Channel from "./pages/Channel";
-import Login from "./pages/Login";
+import { AuthCheck, SuspenseWithPerf } from "reactfire";
+import { G } from "./components";
+import { CircleLoader } from "react-spinners";
+import styled from "styled-components";
+import { StoreContext } from "./store";
 import ServerJoin from "./pages/ServerJoin";
-import ErrorBoundary from "./components/error";
+import { ErrorBoundary } from "./components/fbErrorCatcher";
 
 export const Routes: FunctionComponent<any> = (props) => {
   const { dispatch } = useContext(StoreContext);
@@ -43,21 +47,25 @@ export const Routes: FunctionComponent<any> = (props) => {
 
   return (
     <G.Container id="global-container">
-      <G.Navbar {...props} />
+      <Suspense fallback="Loading...">
+        <G.Navbar {...props} />
+      </Suspense>
       <SuspenseWithPerf
         fallback={<CircleLoader />}
         traceId={"sidebar-server-list"}
       >
-        <ErrorBoundary>
-          <G.Sidebar {...props} />
-        </ErrorBoundary>
+        <Suspense fallback="Loading...">
+          <AuthCheck fallback={<div />}>
+            <G.Sidebar {...props} />
+          </AuthCheck>
+        </Suspense>
       </SuspenseWithPerf>
       <S.Main ref={mainRef} id="page-wrapper">
-        <ErrorBoundary>
-          <SuspenseWithPerf
-            fallback={<CircleLoader />}
-            traceId={props.uri ?? "traceId"}
-          >
+        <SuspenseWithPerf
+          fallback={<CircleLoader />}
+          traceId={props.uri ?? "traceId"}
+        >
+          <ErrorBoundary>
             <Router
               style={{
                 display: "flex",
@@ -65,13 +73,12 @@ export const Routes: FunctionComponent<any> = (props) => {
               }}
             >
               <Home path="/" />
-              <Login path="/login" />
               <Server path="/server/:serverId" />
               <ServerJoin path="/server/:serverId/join/:joinCode" />
               <Channel path="/server/:serverId/:channelId" />
             </Router>
-          </SuspenseWithPerf>
-        </ErrorBoundary>
+          </ErrorBoundary>
+        </SuspenseWithPerf>
       </S.Main>
     </G.Container>
   );

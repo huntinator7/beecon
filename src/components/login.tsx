@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { useAuth } from "reactfire";
 import * as firebase from "firebase";
 import { Button } from "@material-ui/core";
-import { RouteComponentProps } from "@reach/router";
+import { redirectTo, RouteComponentProps } from "@reach/router";
 import styled from "styled-components";
 
 interface Props extends RouteComponentProps {}
@@ -14,7 +14,10 @@ const Login: FunctionComponent<Props> = () => {
     let provider = new firebase.auth.GoogleAuthProvider();
     provider.addScope("profile");
     provider.addScope("email");
-    auth.signInWithRedirect(provider);
+    auth.signInWithRedirect(provider).then((res) => {
+      console.log(res);
+      redirectTo("/");
+    });
   };
   return (
     <S.Page>

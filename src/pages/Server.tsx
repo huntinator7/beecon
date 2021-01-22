@@ -10,8 +10,11 @@ import {
 } from "reactfire";
 import styled, { css } from "styled-components";
 import "firebase/firestore";
-import Login from "./Login";
+import Login from "../components/login";
 import { User } from "firebase";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import { Snackbar } from "@material-ui/core";
+import { Alert } from "@material-ui/lab";
 
 interface Props extends RouteComponentProps {
   serverId?: string;
@@ -26,10 +29,12 @@ const Server: FunctionComponent<Props> = (props) => {
   const [discordWebhookUrl, setDiscordWebhookUrl] = useState("");
   const [discordChannelId, setDiscordChannelId] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
 
   const serverRef = firestore.collection("Server").doc(props.serverId);
   const channelListRef = serverRef.collection("Channel");
-  const userServerRef = serverRef.collection("User").doc(user.uid);
+  const userServerRef = serverRef.collection("User").doc(user?.uid ?? "a");
 
   const server: any = useFirestoreDocData(serverRef);
   const channelList: any[] = useFirestoreCollectionData(channelListRef);
@@ -76,6 +81,14 @@ const Server: FunctionComponent<Props> = (props) => {
     }
   }, [user, userServer]);
 
+  useEffect(() => {
+    console.log(server);
+    const serverJoinCode = server.joinCode;
+    if (serverJoinCode) {
+      setJoinCode(serverJoinCode);
+    }
+  }, [server]);
+
   return (
     <AuthCheck fallback={<Login />}>
       <S.Container>
@@ -86,6 +99,21 @@ const Server: FunctionComponent<Props> = (props) => {
             <Link to={c.id}>{c.ChannelName}</Link>
           ))}
         </S.ChannelList>
+        <CopyToClipboard
+          text={`${window.location.href}/join/${joinCode}`}
+          onCopy={() => setCopied(true)}
+        >
+          <S.JoinButton>Copy Join Code</S.JoinButton>
+        </CopyToClipboard>
+        <Snackbar
+          open={copied}
+          autoHideDuration={4000}
+          onClose={() => setCopied(false)}
+        >
+          <Alert onClose={() => setCopied(false)} severity="success">
+            Invite Link copied to clipboard!
+          </Alert>
+        </Snackbar>
         {isAdmin ? (
           <>
             <S.Subtitle>Admin Functions</S.Subtitle>
@@ -198,5 +226,10 @@ const S = {
     > h3 {
       margin-top: 0px;
     }
+  `,
+  JoinButton: styled.button`
+    ${C.Button};
+    font-size: 1em;
+    margin: 10px;
   `,
 };

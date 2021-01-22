@@ -28,7 +28,7 @@ import {
 } from "@material-ui/core";
 import { formatRelative } from "date-fns";
 import { StoreContext } from "../store";
-import Login from "./Login";
+import Login from "../components/login";
 import { useSocket } from "../hooks/socket";
 
 const useStyles = makeStyles((theme) => ({
@@ -249,6 +249,7 @@ const S = {
     flex-direction: column;
     justify-content: center;
     justify-self: center;
+    width: 100%;
     h1,
     h2,
     h3 {

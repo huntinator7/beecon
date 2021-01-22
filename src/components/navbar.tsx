@@ -10,6 +10,7 @@ import React, { useContext } from "react";
 import MenuIcon from "@material-ui/icons/Menu";
 import { StoreContext } from "../store";
 import { navigate } from "@reach/router";
+import { useAuth } from "reactfire";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 const Navbar = (_props: any) => {
   const { dispatch } = useContext(StoreContext);
   const classes = useStyles();
+  const auth = useAuth();
 
   const toggleSidebar = () => {
     dispatch({ type: "TOGGLE_SIDEBAR" });
@@ -57,8 +59,11 @@ const Navbar = (_props: any) => {
         >
           Beecon
         </Typography>
-        <Button color="inherit" onClick={() => navigate("/login")}>
-          Login
+        <Button
+          color="inherit"
+          onClick={() => auth.signOut().then(() => window.location.reload())}
+        >
+          Log Out
         </Button>
       </Toolbar>
     </AppBar>
